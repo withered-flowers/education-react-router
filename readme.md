@@ -621,6 +621,20 @@ Nah setelah ini mari kita melihat suatu permasalahan yang baru lagi yah:
 
 ### Nested Routes
 
+Untuk menjawab pertanyaan di atas, kita harus mengetahui terlebih dahulu apa yang dimaksud dengan `slot-ting` atau membuat `nested routes` (mirip dengan `partials` pada ejs dan `vue router`).
+
+Hal ini dapat dicapai dengan menggunakan suatu hal yang bernama `Outlet` yang dimiliki oleh `React Router`.
+
+Untuk dokumentasi `Outlet` dapat dibaca [di sini](https://reactrouter.com/en/main/components/outlet)
+
+Setelah membaca dokumentasi ini, maka sekarang idenya adalah:
+
+- **Bagaimana caranya membuat sebuah `Layout` yang bisa menerima sebuah component NavBar dan bisa menerima View yang dinamis berdasarkan routing yang ada?**
+
+Langkah untuk mensolusikan hal ini adalah sebagai berikut:
+
+1.
+
 ### Route Params
 
 ### Protected Routes
@@ -628,7 +642,4 @@ Nah setelah ini mari kita melihat suatu permasalahan yang baru lagi yah:
 ### Referensi
 
 - [React Router - Tutorial](https://reactrouter.com/en/main/start/tutorial)
-
-```
-
-```
+- [React Router - Outlet](https://reactrouter.com/en/main/components/outlet)
