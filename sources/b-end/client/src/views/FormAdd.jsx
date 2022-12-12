@@ -1,6 +1,11 @@
 import { useState } from "react";
+// ? Import useNavigate dari react-router-dom
+import { useNavigate } from "react-router-dom";
 
 const FormAdd = () => {
+  // ? Panggil useNavigate dengan nama navigate
+  const navigate = useNavigate();
+
   const [formInput, setFormInput] = useState({
     url: "",
     thumbnailUrl: "",
@@ -40,6 +45,12 @@ const FormAdd = () => {
 
       // ? Ini jadinya tidak digunakan lagi karena ada di tempat yang berbeda
       // setCurrentPage("card");
+
+      // ? Gunakan navigate untuk berpindah ke halaman `/`
+      // ! Kita tidak perlu menggunakan fetchPhotos lagi, karena
+      // ! Ketika berpindah ke halaman `/` maka data akan di-fetch kembali
+      // ! (re-render)
+      navigate("/");
     } catch (err) {
       console.log(err);
     }

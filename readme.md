@@ -391,12 +391,233 @@ Langkah untuk menambahkan routingnya adalah sebagai berikut:
 
 1. Maka seharusnya ketika kita membuka web kita lagi, sudah bisa membuka `/` dan `/form-add` dengan baik.
 
-Sampai di sini kita sudah bisa membuka webnya dan memiliki 2 routing / endpoint, DENGAN BEBERAPA MASALAH:
+Sampai di sini kita sudah bisa membuka webnya dan memiliki 2 routing / endpoint, DENGAN MASALAH BARU:
 
-- Bagaimanakah cara kita menggunakan NavBar yang ada untuk bisa berpindah ke halaman utama (`/`) dan halaman form (`/form-add`)? Apakah bisa menggunakan anchor href saja?
-- Bagaimanakah caranya supaya baik pada `/` maupun `/form-add` sama sama memiliki `NavBar`? apakah perlu didefinisikan dua kali?
+- **Bagaimanakah cara kita menggunakan NavBar yang ada untuk bisa berpindah ke halaman utama (`/`) dan halaman form (`/form-add`)? Apakah bisa menggunakan anchor href saja?**
 
 ### Navigasi
+
+Untuk bisa menjawab permasalahan pertama yang ada, kita harus bisa mengerti bagaimana cara router bisa melakukan suatu hal yang bernama `Navigasi`. Navigasi di dalam `React Router` ini sendiri bisa menjadi 2 bagian besar:
+
+- _Direct_ menggunakan `Link`
+- _Programmatic_ menggunakan `useNavigate`
+
+Pada pembelajaran ini kita akan mencoba untuk membahas keduanya yah !
+
+Mari kita coba sekarang untuk menggunakan `Link` terlebih dahulu.
+
+Langkah-langkahnya adalah sebagai berikut:
+
+1. Membuat sebuah folder baru pada `src` dengan nama `components` (`src/components`)
+1. Membuat sebuah file baru pada folder tersebut dengan nama `NavBar.jsx` (`/src/components/NavBar.jsx`)
+1. Memindahkan fungsi `navigationOnClickHandler` dan section `{/* Navbar */}` dari `src/views/Home.jsx` ke `src/components/NavBar.jsx` sehingga kodenya menjadi seperti berikut:
+
+   ```js
+   // File: src/components/NavBar.jsx
+   const NavBar = () => {
+     const navigationOnClickHandler = (event, pageName) => {
+       event.preventDefault();
+
+       // ? Ini jadinya tidak digunakan lagi karena sudah menggunakan Router
+       // setCurrentPage(pageName);
+     };
+
+     return (
+       <nav
+         style={{
+           display: "flex",
+           flexDirection: "row",
+           justifyContent: "space-between",
+           alignItems: "center",
+         }}
+       >
+         <div>
+           <h1>Belajar Router</h1>
+         </div>
+
+         <ul
+           style={{
+             display: "flex",
+             flexDirection: "row",
+             gap: "1em",
+             listStyleType: "none",
+             padding: "0em",
+           }}
+         >
+           <li>
+             <a
+               href="#"
+               onClick={(evt) => navigationOnClickHandler(evt, "card")}
+             >
+               Table JSONServer
+             </a>
+           </li>
+           <li>
+             <a
+               href="#"
+               onClick={(evt) => navigationOnClickHandler(evt, "form")}
+             >
+               Form JSONServer
+             </a>
+           </li>
+         </ul>
+       </nav>
+     );
+   };
+
+   export default NavBar;
+   ```
+
+1. Mengimport component NavBar pada `src/views/Home.jsx` dan panggil pada JSX yang ada.
+
+   ```js
+   // File: src/views/Home.jsx
+
+   ...
+   // ? Import NavBar dari components
+   import NavBar from "../components/NavBar";
+
+   function Home() {
+     ...
+
+     return (
+       ...
+
+       {/* NavBar */}
+       {/* ? Gunakan NavBar di sini */}
+       <NavBar />
+
+       ...
+     )
+   }
+   ```
+
+1. Memodifikasi kembali file `src/components/NavBar.jsx` untuk menggunakan `Link`
+
+   ```js
+   // ? import Link dari react-router-dom
+   import { Link } from "react-router-dom";
+
+   const NavBar = () => {
+     const navigationOnClickHandler = (event, pageName) => {
+       event.preventDefault();
+
+       // ? Ini jadinya tidak digunakan lagi karena sudah menggunakan Router
+       // setCurrentPage(pageName);
+     };
+
+     return (
+       <nav
+         style={{
+           display: "flex",
+           flexDirection: "row",
+           justifyContent: "space-between",
+           alignItems: "center",
+         }}
+       >
+         <div>
+           <h1>Belajar Router</h1>
+         </div>
+
+         <ul
+           style={{
+             display: "flex",
+             flexDirection: "row",
+             gap: "1em",
+             listStyleType: "none",
+             padding: "0em",
+           }}
+         >
+           <li>
+             <a
+               href="#"
+               onClick={(evt) => navigationOnClickHandler(evt, "card")}
+             >
+               Table JSONServer
+             </a>
+           </li>
+           <li>
+             {/* Ganti a href menjadi Link */}
+             {/* <a href="#" onClick={(evt) => navigationOnClickHandler(evt, "form")}>
+               Form JSONServer
+             </a> */}
+             <Link to="/form-add">Form JSONServer</Link>
+           </li>
+         </ul>
+       </nav>
+     );
+   };
+
+   export default NavBar;
+   ```
+
+1. Dan _voila_ ketika kita membuka kembali halaman utama yang sudah dibuat (`/`), `NavBar` sudah bisa ditekan dan pindah ke halaman `/form-add` !
+
+Selanjutnya bagaimana bila kita akan menggunakan `FormAdd` dengan sebaik-baiknya?
+
+Bagaimana caranya supaya bisa berpindah setelah `FormAdd` telah melakukan event submitnya?
+
+Solusinya adalah menggunakan `programmatic navigation`.
+
+Langkah-langkah untuk melakukan `programmatic navigation` pada `React Router` dengan menggunakan sesuatu yang bernama `useNavigate` adalah sebagai berikut:
+
+1. Membuka kembali file `src/views/FormAdd.jsx` dan memodifikasi kodenya untuk menggunakan `useNavigate`. Adapun kodenya adalah sebagai berikut:
+
+   ```js
+   import { useState } from "react";
+   // ? Import useNavigate dari react-router-dom
+   import { useNavigate } from "react-router-dom";
+
+   const FormAdd = () => {
+     // ? Panggil useNavigate dengan nama navigate
+     const navigate = useNavigate();
+
+     ...
+
+     const formOnSubmitHandler = async (event) => {
+       event.preventDefault();
+
+       try {
+         const dataToSend = {
+           ...formInput,
+           albumId: 3,
+         };
+
+         const response = await fetch(`http://localhost:3000/photos`, {
+           method: "POST",
+           headers: {
+             "Content-Type": "application/json",
+           },
+           body: JSON.stringify(dataToSend),
+         });
+         await response.json();
+
+         resetFormInput();
+
+         // ? Ini jadinya tidak digunakan lagi karena ada di tempat yang berbeda
+         // await fetchPhotos();
+
+         // ? Ini jadinya tidak digunakan lagi karena ada di tempat yang berbeda
+         // setCurrentPage("card");
+
+         // ? Gunakan navigate untuk berpindah ke halaman `/`
+         // ! Kita tidak perlu menggunakan fetchPhotos lagi, karena
+         // ! Ketika berpindah ke halaman `/` maka data akan di-fetch kembali
+         // ! (re-render)
+         navigate("/");
+       } catch (err) {
+         console.log(err);
+       }
+     };
+
+     ...
+   ```
+
+1. Dan _voila_ ! Setelah melakukan form submission pada endpoint `/form-add` maka secara otomatis akan berpindah ke halaman `/` dan data akan di load ulang kembali !
+
+Nah setelah ini mari kita melihat suatu permasalahan yang baru lagi yah:
+
+- **Bagaimanakah caranya supaya baik pada `/` maupun `/form-add` sama sama memiliki `NavBar`? apakah perlu didefinisikan dua kali?**
 
 ### Nested Routes
 

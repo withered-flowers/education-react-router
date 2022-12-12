@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+// ? Import NavBar dari components
+import NavBar from "../components/NavBar";
 
 function Home() {
   // ? Ini jadinya tidak digunakan lagi karena sudah menggunakan Router
@@ -32,13 +34,6 @@ function Home() {
     }
   };
 
-  const navigationOnClickHandler = (event, pageName) => {
-    event.preventDefault();
-
-    // ? Ini jadinya tidak digunakan lagi karena sudah menggunakan Router
-    // setCurrentPage(pageName);
-  };
-
   useEffect(() => {
     fetchPhotos();
   }, []);
@@ -49,45 +44,8 @@ function Home() {
       style={{ fontFamily: "sans-serif", fontSize: "1.2em" }}
     >
       {/* NavBar */}
-      <nav
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          <h1>Belajar Router</h1>
-        </div>
-
-        <ul
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "1em",
-            listStyleType: "none",
-            padding: "0em",
-          }}
-        >
-          <li>
-            <a
-              href="#"
-              onClick={(evt) => navigationOnClickHandler(evt, "card")}
-            >
-              Table JSONServer
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              onClick={(evt) => navigationOnClickHandler(evt, "form")}
-            >
-              Form JSONServer
-            </a>
-          </li>
-        </ul>
-      </nav>
+      {/* ? Gunakan NavBar di sini */}
+      <NavBar />
 
       {/* Detail Photos JSONServer */}
       {Object.keys(detailPhotos).length !== 0 && (
