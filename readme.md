@@ -633,7 +633,70 @@ Setelah membaca dokumentasi ini, maka sekarang idenya adalah:
 
 Langkah untuk mensolusikan hal ini adalah sebagai berikut:
 
-1.
+1. Membuat sebuah folder dengan nama `layouts` pada folder `src` (`src/layouts`)
+1. Membuat sebuah file dengan nama `BaseLayout.jsx` pada folder `layouts` (`/src/layouts/BaseLayout.jsx`)
+1. Menuliskan kode sebagai berikut pada `BaseLayout.jsx`
+
+   ```js
+   // Import outlet dari react-router-dom
+   import { Outlet } from "react-router-dom";
+
+   // Import NavBar di sini
+   import NavBar from "../components/NavBar";
+
+   const BaseLayout = () => {
+     return (
+       // ? Ingat harus Single Root sehingga harus menggunakan Fragment
+       <>
+         {/* Gunakan NavBar di sini */}
+         <NavBar />
+         {/* Gunakan Outlet di sini */}
+         <Outlet />
+       </>
+     );
+   };
+
+   export default BaseLayout;
+   ```
+
+1. Memodifikasi router (`/src/routes/index.jsx`) untuk bisa menggunakan BaseLayout ini. Adapun kodenya adalah sebagai berikut:
+
+   ```js
+   ...
+
+   // ? Import BaseLayout di sini
+   import BaseLayout from "../layouts/BaseLayout";
+
+   // mari kita membuat browser routernya di sini
+   const router = createBrowserRouter([
+     // ? Kita akan mencoba untuk menggunakan Layout di sini
+     // ? Bungkus yang awalnya array ini menjadi sebuah object
+     {
+       // ? Tambahkan element di sini untuk menggunakan BaseLayout
+       element: <BaseLayout />,
+       // ? Gunakan routesnya jadi di sini dengan dibungkus "children"
+       children: [
+         // definisikan routing yang dibutuhkan di sini
+         {
+           // Rute yang ingin ditambahkan
+           path: "/",
+           // Element / Component apa yang muncul ketika pengguna masuk ke rute ini?
+           element: <Home />,
+         },
+         // Tambahan endpoint untuk form-add (FormAdd.jsx)
+         {
+           path: "/form-add",
+           element: <FormAdd />,
+         },
+       ],
+     },
+   ]);
+
+   ...
+   ```
+
+1. Memodifikasi Kode pada `src/views/Home.jsx` untuk tidak menggunakan `NavBar` lagi (import NavBar dan penggunakan <NavBar /> dihapus)
+1. Dan _voila_ ! Sekarang kita sudah bisa membuat `BaseLayout` yang bisa menerima `NavBar` dan juga bisa menerima `Outlet` yang dinamis berdasarkan routing yang ada.
 
 ### Route Params
 

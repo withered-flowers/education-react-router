@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // ? Import NavBar dari components
-import NavBar from "../components/NavBar";
+// import NavBar from "../components/NavBar";
 
 function Home() {
   // ? Ini jadinya tidak digunakan lagi karena sudah menggunakan Router
@@ -45,7 +45,7 @@ function Home() {
     >
       {/* NavBar */}
       {/* ? Gunakan NavBar di sini */}
-      <NavBar />
+      {/* <NavBar /> */}
 
       {/* Detail Photos JSONServer */}
       {Object.keys(detailPhotos).length !== 0 && (
