@@ -4,12 +4,16 @@
 // sebenarnya ada banyak tipe router (tidak hanya browser router saja)
 // tapi untuk web, kita akan menggunakan browser router
 import { createBrowserRouter } from "react-router-dom";
+// ? Import redirect dari react-router-dom
+import { redirect } from "react-router-dom";
 
 // Import Component yang dibutuhkan
 import Home from "../views/Home";
 import FormAdd from "../views/FormAdd";
 // ? Import Detail
 import Detail from "../views/Detail";
+// ? Import Login
+import Login from "../views/Login";
 
 // ? Import BaseLayout di sini
 import BaseLayout from "../layouts/BaseLayout";
@@ -21,6 +25,21 @@ const router = createBrowserRouter([
   {
     // ? Tambahkan element di sini untuk menggunakan BaseLayout
     element: <BaseLayout />,
+    // ? Ceritanya untuk setiap route yang ada di bawah ini
+    // ? Akan kita proteksi
+    // ? Jika tidak ada token, maka akan di redirect ke halaman login
+    loader: () => {
+      // ? Cek apakah ada token di localStorage
+      const token = localStorage.getItem("token");
+      // ? Jika tidak ada, maka redirect ke halaman login
+      if (!token) {
+        return redirect("/login");
+      }
+
+      // ? Harus ada sesuatu yang direturn pada loader
+      // ? sehingga kita return null saja cukup
+      return null;
+    },
     // ? Gunakan routesnya jadi di sini dengan dibungkus "children"
     children: [
       // definisikan routing yang dibutuhkan di sini
@@ -45,6 +64,11 @@ const router = createBrowserRouter([
         element: <FormAdd />,
       },
     ],
+  },
+  // ? Tambahkan route baru untuk melakukan login di sini
+  {
+    path: "/login",
+    element: <Login />,
   },
 ]);
 

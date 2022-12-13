@@ -916,7 +916,133 @@ Langkah untuk mensolusikan hal ini adalah sebagai berikut:
 
 1. Dan _voila_, sampai pada titik ini seharusnya kita sudah berhasil untuk membuat Halaman Home dan Detail yang "terpisah" !
 
+Nah sekarang mari kita masuk ke permasalahan selanjutnya yah:
+
+- **Bagaimana caranya apabila kita memiliki suatu halaman yang hanya bisa diakses oleh user yang sudah login?**
+
 ### Protected Routes
+
+Nah untuk bisa menyelesaikan permasalahan di atas, kita harus mengerti terlebih dahulu konsep yang bernama `Protected Routes` pada `React Router`.
+
+`Protected Routes` artinya adalah kita menggunakan suatu cara untuk bisa memproteksi route yang kita buat agar hanya bisa diakses apabila logic untuk memproteksi route tersebut terpenuhi.
+
+Pada `React Router` (v6.4+) untuk bisa melakukan hal tersebut bisa dilakukan dengan menggunakan 2 hal:
+
+- [Loader](https://reactrouter.com/en/main/route/loader)
+- [redirect](https://reactrouter.com/en/main/fetch/redirect)
+
+Nah setelah melihat dokumentasinya, maka idenya sekarang ini adalah:
+
+- Membuat sebuah halaman untuk bisa melakukan login
+- Menambahkan logic untuk `Loader` dan `redirect` pada halaman yang ingin kita proteksi
+
+Langkah untuk mensolusikan hal ini adalah:
+
+1. Membuat sebuah file baru dengan nama `src/views/Login.jsx` dan menuliskan kode sederhana untuk melakukan login
+
+   ```js
+   import { useNavigate } from "react-router-dom";
+
+   const Login = () => {
+     const navigate = useNavigate();
+
+     const buttonOnClickHandler = () => {
+       // Ini hanyalah simulasi login
+       // In real case mungkin akan menggunakan fetch untuk melakukan login
+       localStorage.setItem("token", "12345");
+       navigate("/");
+     };
+
+     return (
+       <div>
+         <h1>Login</h1>
+         <button onClick={buttonOnClickHandler}>Login</button>
+       </div>
+     );
+   };
+
+   export default Login;
+   ```
+
+1. Mendeklarasikan route Login pada file `src/routes/index.js` serta menambahkan logic untuk `Loader` dan `redirect` pada halaman yang ingin diproteksi
+
+   ```js
+   // Import createBrowserRouter dari react-router-dom
+   // ini berfungsi untuk membuat router
+
+   // sebenarnya ada banyak tipe router (tidak hanya browser router saja)
+   // tapi untuk web, kita akan menggunakan browser router
+   import { createBrowserRouter } from "react-router-dom";
+   // ? Import redirect dari react-router-dom
+   import { redirect } from "react-router-dom";
+
+   // Import Component yang dibutuhkan
+   import Home from "../views/Home";
+   import FormAdd from "../views/FormAdd";
+   // ? Import Detail
+   import Detail from "../views/Detail";
+   // ? Import Login
+   import Login from "../views/Login";
+
+   // ? Import BaseLayout di sini
+   import BaseLayout from "../layouts/BaseLayout";
+
+   // mari kita membuat browser routernya di sini
+   const router = createBrowserRouter([
+     // ? Kita akan mencoba untuk menggunakan Layout di sini
+     // ? Bungkus yang awalnya array ini menjadi sebuah object
+     {
+       // ? Tambahkan element di sini untuk menggunakan BaseLayout
+       element: <BaseLayout />,
+       // ? Ceritanya untuk setiap route yang ada di bawah ini
+       // ? Akan kita proteksi
+       // ? Jika tidak ada token, maka akan di redirect ke halaman login
+       loader: () => {
+         // ? Cek apakah ada token di localStorage
+         const token = localStorage.getItem("token");
+         // ? Jika tidak ada, maka redirect ke halaman login
+         if (!token) {
+           return redirect("/login");
+         }
+
+         // ? Harus ada sesuatu yang direturn pada loader
+         // ? sehingga kita return null saja cukup
+         return null;
+       },
+       // ? Gunakan routesnya jadi di sini dengan dibungkus "children"
+       children: [
+         // definisikan routing yang dibutuhkan di sini
+         {
+           // Rute yang ingin ditambahkan
+           path: "/",
+           // Element / Component apa yang muncul ketika pengguna masuk ke rute ini?
+           element: <Home />,
+           children: [
+             // ? Tambahkan path detail di sini
+             // ? Perhatikan di sini kita tidak menggunakan absolute path
+             // ? Tidak ada `/` di depannya
+             {
+               path: ":id",
+               element: <Detail />,
+             },
+           ],
+         },
+         // Tambahan endpoint untuk form-add (FormAdd.jsx)
+         {
+           path: "/form-add",
+           element: <FormAdd />,
+         },
+       ],
+     },
+     // ? Tambahkan route baru untuk melakukan login di sini
+     {
+       path: "/login",
+       element: <Login />,
+     },
+   ]);
+
+   export default router;
+   ```
 
 ### Bonus
 
