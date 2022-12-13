@@ -8,6 +8,9 @@
 - [Nested Routes](#nested-routes)
 - [Route Params](#route-params)
 - [Protected Routes](#protected-routes)
+- [Bonus](#bonus)
+  - [NavLink](#navlink)
+  - [Logic for Logout (Conditional Rendering)](#logic-for-logout-conditional-rendering)
 - [Referensi](#referensi)
 
 ### Disclaimer
@@ -698,9 +701,249 @@ Langkah untuk mensolusikan hal ini adalah sebagai berikut:
 1. Memodifikasi Kode pada `src/views/Home.jsx` untuk tidak menggunakan `NavBar` lagi (import NavBar dan penggunakan <NavBar /> dihapus)
 1. Dan _voila_ ! Sekarang kita sudah bisa membuat `BaseLayout` yang bisa menerima `NavBar` dan juga bisa menerima `Outlet` yang dinamis berdasarkan routing yang ada.
 
+Sekarang mari kita juga menambahkan routing untuk memisahkan antara halaman "detail" dari photo dan halaman "card" dari photo.
+
+Sebenarnya hal ini bisa bisa saja kita lakukan dengan membuat suatu children di dalam path `/` yang ada. Tapi permasalahan selanjutnya adalah:
+
+**- Bagaimanakah cara kita untuk bisa menghandle `kedinamisan` data yang ada pada halaman `detail` tersebut?**
+
 ### Route Params
 
+Untuk bisa menjawab pertanyaan di atas, kita harus mengetahui mengenai cara penggunaan `Route Params` pada `React Router` dan bagaimana cara untuk membacanya dengan menggunakan `useParams`.
+
+Dokumentasi:
+
+- [`Route Params`](https://reactrouter.com/en/main/routers/create-browser-router#routes)
+- [`useParams`](https://reactrouter.com/en/main/hooks/use-params)
+
+Nah setelah membaca dokumentasi ini, maka idenya untuk menyelesaikan masalah di atas adalah:
+
+- Memisahkan halaman `Detail` dari `Home`
+- Membuat sebuah path baru dengan nama `/:id` pada `routes/index.jsx`
+- Menambahkan `Outlet` pada Component `Home` untuk bisa menerima halaman `Detail`
+- Menggunakan `useParams` pada halaman `Detail` untuk bisa menerima kedinamisan data yang ada pada halaman `Detail`
+
+Langkah untuk mensolusikan hal ini adalah sebagai berikut:
+
+1. Memodifikasi halaman `views/Home.jsx` dan menuliskan kode sebagai berikut:
+
+   ```js
+   import { useEffect, useState } from "react";
+   // ? Import Outlet dan useNavigate dari react-router-dom
+   import { Outlet, useNavigate } from "react-router-dom";
+
+   function Home() {
+     const [photos, setPhotos] = useState([]);
+     const navigate = useNavigate();
+
+     const fetchPhotos = async () => {
+       try {
+         const response = await fetch("http://localhost:3000/photos");
+         const responseJson = await response.json();
+
+         setPhotos(responseJson);
+       } catch (err) {
+         console.log(err);
+       }
+     };
+
+     const cardPhotosAnchorOnClickHandler = async (event, id) => {
+       event.preventDefault();
+
+       // Gunakan navigate di sini
+       navigate(`/${id}`);
+     };
+
+     useEffect(() => {
+       fetchPhotos();
+     }, []);
+
+     return (
+       <div
+         className="App"
+         style={{ fontFamily: "sans-serif", fontSize: "1.2em" }}
+       >
+         {/* Gunakan Outlet di sini */}
+         <Outlet />
+
+         {/* List Photos JSONServer */}
+         <section>
+           <h3>Section - List of Photos</h3>
+
+           <div
+             style={{
+               display: "flex",
+               flexWrap: "wrap",
+               gap: "1em",
+               margin: "auto auto",
+             }}
+           >
+             {photos.map((photo) => (
+               <div key={photo.id}>
+                 <img height={120} width={120} src={photo.url} />
+                 <div style={{ textAlign: "center" }}>
+                   <a
+                     href="#"
+                     onClick={(evt) =>
+                       cardPhotosAnchorOnClickHandler(evt, photo.id)
+                     }
+                   >
+                     Detail
+                   </a>
+                 </div>
+               </div>
+             ))}
+           </div>
+         </section>
+       </div>
+     );
+   }
+
+   export default Home;
+   ```
+
+1. Membuat sebuah page baru dengan nama `views/Detail.jsx` dan menuliskan kode sebagai berikut:
+
+   ```js
+   import { useEffect, useState } from "react";
+   // ? Di sini kita harus menggunakan useParams
+   import { useParams } from "react-router-dom";
+
+   const Detail = () => {
+     // ? Di sini kita harus menggunakan useParams
+     // ? Ingat tadi kita menuliskan pada pathnya adalah :id
+     const { id } = useParams();
+
+     const [detailPhotos, setDetailPhotos] = useState({});
+
+     const fetchPhotoDetail = async (id) => {
+       try {
+         const response = await fetch(`http://localhost:3000/photos/${id}`);
+         const responseJson = await response.json();
+
+         setDetailPhotos(responseJson);
+       } catch (err) {
+         console.log(err);
+       }
+     };
+
+     // ? Di sini kita panggilnya dengan menggunakan useEffect
+     useEffect(
+       // Effect
+       () => {
+         fetchPhotoDetail(id);
+       },
+       // Jangan lupa Deps Listnya, karena akan kita panggil lagi ketika
+       // Params berubah
+       [id]
+     );
+
+     return (
+       <>
+         {Object.keys(detailPhotos).length !== 0 && (
+           <section>
+             <h3>Section - Detail Photos</h3>
+
+             <div>Id: {detailPhotos?.id}</div>
+             <div>AlbumId: {detailPhotos?.albumId}</div>
+             <div>Title: {detailPhotos?.title}</div>
+             <div>URL: {detailPhotos?.url}</div>
+             <div>Thumbnail URL: {detailPhotos?.thumbnailUrl}</div>
+           </section>
+         )}
+       </>
+     );
+   };
+
+   export default Detail;
+   ```
+
+1. Selanjutnya kita akan mendefinisikan endpoint / route tambahan pada `src/routes/index.js`
+
+   ```js
+   // Import createBrowserRouter dari react-router-dom
+   // ini berfungsi untuk membuat router
+
+   // sebenarnya ada banyak tipe router (tidak hanya browser router saja)
+   // tapi untuk web, kita akan menggunakan browser router
+   import { createBrowserRouter } from "react-router-dom";
+
+   // Import Component yang dibutuhkan
+   import Home from "../views/Home";
+   import FormAdd from "../views/FormAdd";
+   // ? Import Detail
+   import Detail from "../views/Detail";
+
+   // ? Import BaseLayout di sini
+   import BaseLayout from "../layouts/BaseLayout";
+
+   // mari kita membuat browser routernya di sini
+   const router = createBrowserRouter([
+     // ? Kita akan mencoba untuk menggunakan Layout di sini
+     // ? Bungkus yang awalnya array ini menjadi sebuah object
+     {
+       // ? Tambahkan element di sini untuk menggunakan BaseLayout
+       element: <BaseLayout />,
+       // ? Gunakan routesnya jadi di sini dengan dibungkus "children"
+       children: [
+         // definisikan routing yang dibutuhkan di sini
+         {
+           // Rute yang ingin ditambahkan
+           path: "/",
+           // Element / Component apa yang muncul ketika pengguna masuk ke rute ini?
+           element: <Home />,
+           children: [
+             // ? Tambahkan path detail di sini
+             // ? Perhatikan di sini kita tidak menggunakan absolute path
+             // ? Tidak ada `/` di depannya
+             {
+               path: ":id",
+               element: <Detail />,
+             },
+           ],
+         },
+         // Tambahan endpoint untuk form-add (FormAdd.jsx)
+         {
+           path: "/form-add",
+           element: <FormAdd />,
+         },
+       ],
+     },
+   ]);
+
+   export default router;
+   ```
+
+1. Dan _voila_, sampai pada titik ini seharusnya kita sudah berhasil untuk membuat Halaman Home dan Detail yang "terpisah" !
+
 ### Protected Routes
+
+### Bonus
+
+Bonus ini hanya berisi tambahan untuk membuat kode kita menjadi lebih berwarna dan terproteksi yah !
+
+Mari kita coba lihat beberapa hal: `NavLink` dan `Logic for Logout`
+
+#### NavLink
+
+Untuk membuat navigasi yang lebih "berwarna", pada `React Router` ini selain disediakan `Link` juga disediakan `NavLink`. `NavLink` ini memiliki beberapa props tambahan yang bisa kita gunakan untuk membuat navigasi yang lebih "berwarna" ketika sedang aktif.
+
+Dokumentasi untuk [`NavLink`](https://reactrouter.com/en/main/components/nav-link).
+
+#### Logic for Logout (Conditional Rendering)
+
+Nah dengan memanfaatkan `Loader` pada yang sebelumnya, kita bisa membuat protected routes yang ada. Kemudian pada halaman utama yang ada, bagaimana caranya kah kita memilah antara orang ini sedang Login ataupun sedang Logout ?
+
+Maka caranya adalah dengan menggunakan `Conditional Rendering` berdasarkan token yang disimpan di dalam `localStorage`.
+
+```js
+// Logic untuk mengecek apakah sedang login atau tidak
+const isLogin = Boolean(localStorage.getItem("token"));
+```
+
+Dan Selesai untuk semuanya !
+
+Panjang sekali yah, tapi semoga bermanfaat !
 
 ### Referensi
 

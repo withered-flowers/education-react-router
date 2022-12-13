@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+// ? Import Outlet dan useNavigate dari react-router-dom
+import { Outlet, useNavigate } from "react-router-dom";
+
 // ? Import NavBar dari components
 // import NavBar from "../components/NavBar";
 
@@ -8,7 +11,11 @@ function Home() {
   // const [currentPage, setCurrentPage] = useState("card");
 
   const [photos, setPhotos] = useState([]);
-  const [detailPhotos, setDetailPhotos] = useState({});
+
+  // ? Tidak digunakan lagi karena sudah dipindahkan ke halaman Detail
+  // const [detailPhotos, setDetailPhotos] = useState({});
+
+  const navigate = useNavigate();
 
   const fetchPhotos = async () => {
     try {
@@ -24,14 +31,18 @@ function Home() {
   const cardPhotosAnchorOnClickHandler = async (event, id) => {
     event.preventDefault();
 
-    try {
-      const response = await fetch(`http://localhost:3000/photos/${id}`);
-      const responseJson = await response.json();
+    // ? Tidak digunakan lagi karena sudah dipindahkan ke halaman Detail
+    // try {
+    //   const response = await fetch(`http://localhost:3000/photos/${id}`);
+    //   const responseJson = await response.json();
 
-      setDetailPhotos(responseJson);
-    } catch (err) {
-      console.log(err);
-    }
+    //   setDetailPhotos(responseJson);
+    // } catch (err) {
+    //   console.log(err);
+    // }
+
+    // Gunakan navigate di sini
+    navigate(`/${id}`);
   };
 
   useEffect(() => {
@@ -48,7 +59,8 @@ function Home() {
       {/* <NavBar /> */}
 
       {/* Detail Photos JSONServer */}
-      {Object.keys(detailPhotos).length !== 0 && (
+      {/* Tidak digunakan lagi karena sudah dipindahkan ke halaman Detail */}
+      {/* {Object.keys(detailPhotos).length !== 0 && (
         <section>
           <h3>Section - Detail Photos</h3>
 
@@ -58,7 +70,10 @@ function Home() {
           <div>URL: {detailPhotos?.url}</div>
           <div>Thumbnail URL: {detailPhotos?.thumbnailUrl}</div>
         </section>
-      )}
+      )} */}
+
+      {/* Gunakan Outlet di sini */}
+      <Outlet />
 
       {/* List Photos JSONServer */}
       <section>

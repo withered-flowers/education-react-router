@@ -8,6 +8,8 @@ import { createBrowserRouter } from "react-router-dom";
 // Import Component yang dibutuhkan
 import Home from "../views/Home";
 import FormAdd from "../views/FormAdd";
+// ? Import Detail
+import Detail from "../views/Detail";
 
 // ? Import BaseLayout di sini
 import BaseLayout from "../layouts/BaseLayout";
@@ -27,6 +29,15 @@ const router = createBrowserRouter([
         path: "/",
         // Element / Component apa yang muncul ketika pengguna masuk ke rute ini?
         element: <Home />,
+        children: [
+          // ? Tambahkan path detail di sini
+          // ? Perhatikan di sini kita tidak menggunakan absolute path
+          // ? Tidak ada `/` di depannya
+          {
+            path: ":id",
+            element: <Detail />,
+          },
+        ],
       },
       // Tambahan endpoint untuk form-add (FormAdd.jsx)
       {
