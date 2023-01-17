@@ -1,8 +1,54 @@
-const PhotoForm = ({
-  formOnSubmitHandler,
-  formInput,
-  formInputOnChangeHandler,
-}) => {
+import { useState } from "react";
+
+const PhotoForm = () => {
+  const [formInput, setFormInput] = useState({
+    url: "",
+    thumbnailUrl: "",
+    title: "",
+  });
+
+  const resetFormInput = () => {
+    setFormInput({
+      url: "",
+      thumbnailUrl: "",
+      title: "",
+    });
+  };
+
+  const formOnSubmitHandler = async (event) => {
+    event.preventDefault();
+
+    try {
+      const dataToSend = {
+        ...formInput,
+        albumId: 3,
+      };
+
+      const response = await fetch(`http://localhost:3000/photos`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+      await response.json();
+
+      resetFormInput();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const formInputOnChangeHandler = (event) => {
+    const newObj = {
+      ...formInput,
+    };
+
+    newObj[event.target.name] = event.target.value;
+
+    setFormInput(newObj);
+  };
+
   return (
     <section>
       <h3>Section - Form - Adding Photos</h3>

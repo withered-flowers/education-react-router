@@ -1,4 +1,36 @@
-const PhotoList = ({ photos, cardPhotosAnchorOnClickHandler }) => {
+import { useState, useEffect } from "react";
+
+const PhotoList = ({ setDetailPhotos }) => {
+  const [photos, setPhotos] = useState([]);
+
+  const fetchPhotos = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/photos");
+      const responseJson = await response.json();
+
+      setPhotos(responseJson);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const cardPhotosAnchorOnClickHandler = async (event, id) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(`http://localhost:3000/photos/${id}`);
+      const responseJson = await response.json();
+
+      setDetailPhotos(responseJson);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPhotos();
+  }, []);
+
   return (
     <section>
       <h3>Section - List of Photos</h3>
