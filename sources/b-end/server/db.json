@@ -4,7 +4,7 @@
       "albumId": 1,
       "id": 1,
       "title": "accusamus beatae ad facilis cum similique qui sunt",
-      "url": "https://via.placeholder.com/600/92c952",
+      "url": "https://placecats.com/600/600",
       "thumbnailUrl": "https://via.placeholder.com/150/92c952"
     },
     {
@@ -706,6 +706,20 @@
       "title": "Lipsum",
       "albumId": 3,
       "id": 101
+    },
+    {
+      "url": "https://placecats.com/600/600",
+      "thumbnailUrl": "https://placecats.com/150/150",
+      "title": "Halo Dunia",
+      "albumId": 3,
+      "id": 102
+    },
+    {
+      "url": "https://placecats.com/600/600",
+      "thumbnailUrl": "https://placecats.com/150/150",
+      "title": "Halo Lagi",
+      "albumId": 3,
+      "id": 103
     }
   ]
 }
